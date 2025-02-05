@@ -11,6 +11,7 @@ Follow these steps to set up the script on your server:
 Clone the repository to the `/opt/` directory:
 
 cd /opt/
+
 sudo git clone https://github.com/MShanavas/CloudFlare-DDNS.git
 
 ### 2. Make the script executable
