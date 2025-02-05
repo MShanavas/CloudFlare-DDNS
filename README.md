@@ -26,6 +26,7 @@ Before running the script, you'll need to configure it with your Cloudflare cred
 ### 4. Schedule the script to run periodically
 
 Add the script to crontab to run it at regular intervals (e.g., every 5 minutes):
+
 crontab -e
 
 */5 * * * * /opt/CloudFlare-DDNS/cloudflare-ddns.sh
