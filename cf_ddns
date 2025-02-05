@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Cloudflare DNS record information
+API_TOKEN="" # Replace with your CloudFlare Token
+ZONE_ID=""  # Replace with your DNS ZONE ID
+RECORD_ID=""  # Replace with your actual DNS record ID
+SUBDOMAIN=""  # Replace with your actual subdomain name
+
+# Fetch the current public IP
+CURRENT_IP=$(curl -s ifconfig.me)
+
+# Get the current Cloudflare DNS record IP
+CF_IP=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
+    -H "Authorization: Bearer $API_TOKEN" \
+    -H "Content-Type: application/json" | jq -r '.result.content')
+
+# Output the current IP in Cloudflare
+echo "The current IP in Cloudflare for the record '$SUBDOMAIN' is: $CF_IP"
+
+# Output the server's current IP
+echo "The current server IP is: $CURRENT_IP"
+
+# If the server IP differs from the Cloudflare IP, update Cloudflare
+if [ "$CURRENT_IP" != "$CF_IP" ]; then
+    echo "Public IP has changed. Updating Cloudflare DNS record with new IP: $CURRENT_IP"
+
+    # Prepare the Cloudflare API request body
+    curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
+    -H "Authorization: Bearer $API_TOKEN" \
+    -H "Content-Type: application/json" \
+    --data "{\"type\":\"A\",\"name\":\"$SUBDOMAIN\",\"content\":\"$CURRENT_IP\",\"ttl\":300,\"proxied\":true}"
+else
+    echo "IP has not changed. Cloudflare IP is already up to date: $CURRENT_IP"
+fi
